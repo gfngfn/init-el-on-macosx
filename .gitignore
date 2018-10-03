@@ -1,0 +1,8 @@
+*~
+.DS_Store
+*.elc
+elpa/
+auto-install/
+kkcrc
+ac-comphist.dat
+recentf
