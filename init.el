@@ -191,7 +191,7 @@
  '(custom-enabled-themes (quote (deeper-blue)))
  '(package-selected-packages
    (quote
-    (sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
+    (elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
  '(tuareg-match-clause-indent 2))
 
 ;; ---- ---- merlin ---- ----
@@ -269,6 +269,9 @@
             (local-set-key (kbd "(") 'gfn-insert-paren-pair)
             (local-set-key (kbd "[") 'gfn-insert-square-bracket-pair)
             (local-set-key (kbd "{") 'gfn-insert-brace-pair)))
+
+;; ---- ---- js-mode ---- ----
+(setq js-indent-level 2)
 
 ;; ==== ==== ==== ==== MY PACKAGES ==== ==== ==== ====
 (require 'gfn-latex)
