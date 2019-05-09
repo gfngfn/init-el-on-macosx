@@ -35,6 +35,9 @@
 ;; ---- ---- Markdown ---- ----
 (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
 
+;; ---- ---- Egison ---- ----
+(add-to-list 'auto-mode-alist '("\\.egi$" . egison-mode))
+
 ;; ---- ---- Macrodown ---- ----
 (add-to-list 'auto-mode-alist '("\\.mcrd$" . mcrd-mode))
 (add-to-list 'auto-mode-alist '("\\.mcrdh$" . mcrd-mode))
@@ -101,6 +104,27 @@
 (defun gfn-insert-brace-pair ()
   (interactive)
   (gfn-insert-paren-pair-scheme "{" "}"))
+
+(defun gfn-enable-transparency ()
+  (interactive)
+  (cond
+   (window-system
+    (progn
+      (set-background-color "Black")
+      (set-foreground-color "LightGray")
+      (set-cursor-color "Gray")
+      (set-frame-parameter nil 'alpha 70)
+      ))
+   (t
+    (message "cannot enable transparency; not a window system"))))
+
+(defun gfn-set-alpha (alpha-num)
+  (interactive "nalpha: ")
+  (cond
+   (window-system
+    (set-frame-parameter nil 'alpha alpha-num))
+   (t
+    (message "cannot set transparency; not a window system"))))
 
 ;; ==== ==== ==== ==== KEY BIND ==== ==== ==== ====
 ;(global-set-key [M-kanji] 'ignore)
@@ -191,7 +215,7 @@
  '(custom-enabled-themes (quote (deeper-blue)))
  '(package-selected-packages
    (quote
-    (elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
+    (rustic flycheck haskell-mode elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
  '(tuareg-match-clause-indent 2))
 
 ;; ---- ---- merlin ---- ----
@@ -272,6 +296,23 @@
 
 ;; ---- ---- js-mode ---- ----
 (setq js-indent-level 2)
+
+;; ---- ---- css-mode ---- ----
+(setq css-indent-offset 2)
+
+;; ---- ---- egison-mode ---- ----
+(require 'egison-mode)
+
+;; ---- ---- haskell-mode ---- ----
+(require 'hs-lint)
+(defun my-haskell-mode-hook ()
+    (local-set-key (kbd "C-c l") 'hs-lint))
+(add-hook 'haskell-mode-hook 'my-haskell-mode-hook)
+
+;; ---- ---- flycheck ---- ----
+(require 'flycheck)
+(add-hook 'after-init-hook #'global-flycheck-mode)
+(add-hook 'sh-mode-hook 'flycheck-mode)
 
 ;; ==== ==== ==== ==== MY PACKAGES ==== ==== ==== ====
 (require 'gfn-latex)
