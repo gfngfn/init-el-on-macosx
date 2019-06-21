@@ -3,10 +3,10 @@
 (setq gc-cons-threshold (* 20 gc-cons-threshold))
 
 ;; ---- ---- coding system ---- ----
+(set-language-environment "Japanese")
 (prefer-coding-system 'utf-8)
 (setq coding-system-for-read 'utf-8)
 (setq coding-system-for-write 'utf-8)
-(set-language-environment "Japanese")
 
 ;(setq ns-pop-up-frames nil)
 (setq-default indent-tabs-mode nil)
@@ -126,6 +126,14 @@
    (t
     (message "cannot set transparency; not a window system"))))
 
+(defun gfn-insert-datetime-gen (form)
+  (insert (format-time-string form)))
+
+(defun gfn-insert-datetime ()
+  (interactive)
+  (gfn-insert-datetime-gen "%Y-%m-%d %H:%M:%S"))
+
+
 ;; ==== ==== ==== ==== DISTRIBUTED PACKAGES ==== ==== ==== ====
 ;; ---- ---- package ---- ----
 (require 'package)
@@ -179,16 +187,21 @@
  '(custom-enabled-themes (quote (deeper-blue)))
  '(package-selected-packages
    (quote
-    (rustic flycheck haskell-mode elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
+    (ensime scala-mode rustic flycheck haskell-mode elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
  '(tuareg-match-clause-indent 2))
+
+;; ---- ---- scala ---- ----
+;(use-package ensime
+;  :ensure t
+;  :pin melpa-stable)
 
 ;; ---- ---- merlin ---- ----
 (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
- (when (and opam-share (file-directory-p opam-share))
-  (add-to-list 'load-path (expand-file-name "emacs/site-lisp" opam-share))
-  (autoload 'merlin-mode "merlin" nil t nil)
-  (add-hook 'tuareg-mode-hook 'merlin-mode t)
-  (add-hook 'caml-mode-hook 'merlin-mode t)))
+  (when (and opam-share (file-directory-p opam-share))
+    (add-to-list 'load-path (expand-file-name "emacs/site-lisp" opam-share))
+    (autoload 'merlin-mode "merlin" nil t nil)
+    (add-hook 'tuareg-mode-hook 'merlin-mode t)
+    (add-hook 'caml-mode-hook 'merlin-mode t)))
 (setq merlin-ac-setup t)
 
 ;; ---- ---- coq ---- ----
@@ -292,9 +305,10 @@
 (define-key global-map (kbd "(") 'gfn-insert-paren-pair)
 (define-key global-map (kbd "[") 'gfn-insert-square-bracket-pair)
 (define-key global-map (kbd "{") 'gfn-insert-brace-pair)
+(define-key global-map (kbd "<f5>") 'gfn-insert-datetime)
 ;; ---- ---- original ---- ----
-;(define-key global-map (kbd "C-c m") 'gfn-macro)
-;(define-key global-map (kbd "C-c l") 'gfn-insert-line)
+                                        ;(define-key global-map (kbd "C-c m") 'gfn-macro)
+                                        ;(define-key global-map (kbd "C-c l") 'gfn-insert-line)
 ;; ---- ---- helm ---- ----
 (define-key global-map (kbd "C-x C-b") 'helm-buffers-list)
 (define-key global-map (kbd "C-x C-f") 'helm-find-files)
@@ -319,3 +333,7 @@
 (require 'open-group)
 (require 'mcrd)
 (require 'satysfi)
+
+;; ==== ==== ==== ==== FOOTER ==== ==== ==== ====
+(provide 'init)
+;;; init.el ends here
