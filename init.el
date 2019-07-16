@@ -133,6 +133,10 @@
   (interactive)
   (gfn-insert-datetime-gen "%Y-%m-%d %H:%M:%S"))
 
+(defun gfn-insert-coding-utf-8 ()
+  (interactive)
+  (insert "-*- coding: utf-8 -*-"))
+
 
 ;; ==== ==== ==== ==== DISTRIBUTED PACKAGES ==== ==== ==== ====
 ;; ---- ---- package ---- ----
@@ -187,8 +191,39 @@
  '(custom-enabled-themes (quote (deeper-blue)))
  '(package-selected-packages
    (quote
-    (ensime scala-mode rustic flycheck haskell-mode elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
+    (company-go go-mode ensime scala-mode rustic flycheck haskell-mode elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
  '(tuareg-match-clause-indent 2))
+
+;; ---- ---- Golang ---- ----
+(add-to-list 'exec-path (expand-file-name "/usr/local/go/bin/"))
+(add-to-list 'exec-path (expand-file-name "~/go/bin/"))
+
+(add-hook 'go-mode-hook 'flycheck-mode)
+(add-hook 'go-mode-hook
+  (lambda ()
+    (add-hook 'before-save-hook 'gofmt-before-save)
+    (local-set-key (kbd "M-.") 'godef-jump)
+    (set (make-local-variable 'company-backends) '(company-go))
+    (setq indent-tabs-mode nil)
+    (setq c-basic-offset 4)
+    (setq tab-width 4)))
+
+(require 'company-go)
+(add-hook 'go-mode-hook
+  (lambda ()
+    (company-mode)
+    (setq company-transformers '(company-sort-by-backend-importance))
+    (setq company-idle-delay 0)
+    (setq company-minimum-prefix-length 3)
+    (setq company-selection-wrap-around t)
+    (setq completion-ignore-case t)
+    (setq company-dabbrev-downcase nil)
+    (global-set-key (kbd "C-M-i") 'company-complete)
+    (define-key company-active-map (kbd "C-n") 'company-select-next)
+    (define-key company-active-map (kbd "C-p") 'company-select-previous)
+    (define-key company-active-map (kbd "C-s") 'company-filter-candidates)
+    (define-key company-active-map [tab] 'company-complete-selection)
+    (define-key emacs-lisp-mode-map (kbd "C-M-i") 'company-complete)))
 
 ;; ---- ---- scala ---- ----
 ;(use-package ensime
@@ -305,7 +340,8 @@
 (define-key global-map (kbd "(") 'gfn-insert-paren-pair)
 (define-key global-map (kbd "[") 'gfn-insert-square-bracket-pair)
 (define-key global-map (kbd "{") 'gfn-insert-brace-pair)
-(define-key global-map (kbd "<f5>") 'gfn-insert-datetime)
+(define-key global-map (kbd "<f5> t") 'gfn-insert-datetime)
+(define-key global-map (kbd "<f5> u") 'gfn-insert-coding-utf-8)
 ;; ---- ---- original ---- ----
                                         ;(define-key global-map (kbd "C-c m") 'gfn-macro)
                                         ;(define-key global-map (kbd "C-c l") 'gfn-insert-line)
