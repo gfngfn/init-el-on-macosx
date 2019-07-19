@@ -1,3 +1,4 @@
+; -*- lexical-binding: t -*-
 ;; ==== ==== ==== ==== GENRAL SETTINGS ==== ==== ==== ====
 ;; ---- ---- garbage collection ---- ----
 (setq gc-cons-threshold (* 20 gc-cons-threshold))
@@ -137,6 +138,44 @@
   (interactive)
   (insert "-*- coding: utf-8 -*-"))
 
+(defun gfn-find-title-in-head (head-content)
+  (pcase head-content
+    (`((title ,_ ,s) . ,_) ('some s))
+    (`(,_ . ,tail) (gfn-find-title-in-head tail))
+    (`nil, 'none)))
+
+(defun gfn-extract-title-from-dom (data)
+  (pcase data
+    (`(html ,_ ((head . ,head-content) . ,_)) (gfn-find-title-in-head head-content))
+    (_ 'none)))
+
+(defun gfn-insert-md-link-main (url title)
+  (insert (format "* [%s](%s)" title url)))
+
+(defun gfn-request-get-html (url)
+  (request
+   url
+   :parser (lambda () (libxml-parse-html-region (point) (point-max)))
+   :error
+   (cl-function
+    (lambda (&key error-thrown &allow-other-keys&rest _)
+      ('left (format "%S" error-thrown))))
+   :success
+   (cl-function
+    (lambda (&key data &allow-other-keys)
+      ('right data)))))
+
+(defun gfn-insert-md-link (url)
+  (interactive "sURL: ")
+  (pcase (gfn-request-get-html url)
+    (`(right ,data)
+     (pcase (gfn-extract-title-from-dom data)
+       (`(some ,title)
+        (gfn-insert-md-link-main url title))
+       (`none
+        (message "cannot detect the title of the given page"))))
+    (`(left ,error-message)
+     (message "got error: %s" error-message))))
 
 ;; ==== ==== ==== ==== DISTRIBUTED PACKAGES ==== ==== ==== ====
 ;; ---- ---- package ---- ----
@@ -179,6 +218,8 @@
 ;; ---- ---- tuareg ---- ----
 (require 'tuareg)
 (setq tuareg-use-smie nil)
+
+;; ---- ---- Custom --- ---
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -191,7 +232,7 @@
  '(custom-enabled-themes (quote (deeper-blue)))
  '(package-selected-packages
    (quote
-    (company-go go-mode ensime scala-mode rustic flycheck haskell-mode elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
+    (request company-go go-mode ensime scala-mode rustic flycheck haskell-mode elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
  '(tuareg-match-clause-indent 2))
 
 ;; ---- ---- Golang ---- ----
@@ -325,6 +366,9 @@
 (require 'flycheck)
 (add-hook 'after-init-hook #'global-flycheck-mode)
 (add-hook 'sh-mode-hook 'flycheck-mode)
+
+;; ---- ---- request --- ----
+(require 'request)
 
 ;; ==== ==== ==== ==== KEY BIND ==== ==== ==== ====
 ;(global-set-key [M-kanji] 'ignore)
