@@ -1,5 +1,5 @@
-;; ==== ==== ==== ==== GENRAL SETTINGS ==== ==== ==== ====
 ; -*- lexical-binding: t -*-
+;; ==== ==== ==== ==== GENRAL SETTINGS ==== ==== ==== ====
 ;; ---- ---- garbage collection ---- ----
 (setq gc-cons-threshold (* 20 gc-cons-threshold))
 
