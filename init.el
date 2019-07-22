@@ -134,6 +134,10 @@
   (interactive)
   (gfn-insert-datetime-gen "%Y-%m-%d %H:%M:%S"))
 
+(defun gfn-insert-date ()
+  (interactive)
+  (gfn-insert-datetime-gen "%Y-%m-%d"))
+
 (defun gfn-insert-coding-utf-8 ()
   (interactive)
   (insert "-*- coding: utf-8 -*-"))
@@ -147,10 +151,11 @@
 (defun gfn-extract-title-from-dom (data)
   (pcase data
     (`(html ,_ (head ,_ . ,head-content) . ,_) (gfn-find-title-in-head head-content))
+    (`(top ,_ (html ,_ (head ,_ . ,head-content) . ,_) . ,_) (gfn-find-title-in-head head-content))
     (_ `(left "cannot detect head"))))
 
 (defun gfn-insert-md-link-main (url title)
-  (insert (format "* [%s](%s)" title url)))
+  (insert (format "* 参考： [%s](%s)" title url)))
 
 (defun gfn-request-get-html (url callback)
   (interactive "sURL: ")
@@ -398,7 +403,9 @@
 (define-key global-map (kbd "[") 'gfn-insert-square-bracket-pair)
 (define-key global-map (kbd "{") 'gfn-insert-brace-pair)
 (define-key global-map (kbd "<f5> t") 'gfn-insert-datetime)
+(define-key global-map (kbd "<f5> d") 'gfn-insert-date)
 (define-key global-map (kbd "<f5> u") 'gfn-insert-coding-utf-8)
+(define-key global-map (kbd "<f5> l") 'gfn-insert-md-link)
 ;; ---- ---- original ---- ----
                                         ;(define-key global-map (kbd "C-c m") 'gfn-macro)
                                         ;(define-key global-map (kbd "C-c l") 'gfn-insert-line)
