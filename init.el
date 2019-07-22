@@ -170,27 +170,24 @@
 (defun gfn-insert-md-link-main (url title)
   (insert (format "* 参考： [%s](%s)" title url)))
 
-(defun gfn-request-get-html (url callback)
-  (interactive "sURL: ")
+(defun gfn-request-get-html (url cb)
   (request
    url
    :parser 'buffer-string
    :error
    (cl-function
     (lambda (&key error-thrown &allow-other-keys&rest _)
-      (apply callback (list `(left ,(format "%S" error-thrown))))))
+      (apply cb (list `(left ,(format "%S" error-thrown))))))
    :success
    (cl-function
     (lambda (&key data &allow-other-keys)
-      (if data ; -- if `data` is not `nil`
-          (progn
-            (defvar gfn-var-temp)
-            (with-current-buffer (get-buffer-create "*response body*")
-              (erase-buffer)
-              (insert data)
-              (setq gfn-var-temp (libxml-parse-html-region (point-min) (point-max))))
-            (apply callback (list `(right ,gfn-var-temp))))
-        (apply callback (list `(left "nil-data"))))))))
+      (if data
+          (let ((dom (with-current-buffer (get-buffer-create "*response body*")
+                       (erase-buffer)
+                       (insert data)
+                       (libxml-parse-html-region (point-min) (point-max)))))
+            (apply cb (list `(right ,dom))))
+        (apply cb (list `(left ,"nil-data"))))))))
 
 (defun gfn-insert-md-link (url)
   (interactive "sURL: ")
