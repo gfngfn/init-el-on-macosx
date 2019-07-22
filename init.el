@@ -140,42 +140,55 @@
 
 (defun gfn-find-title-in-head (head-content)
   (pcase head-content
-    (`((title ,_ ,s) . ,_) ('some s))
+    (`((title ,_ ,s) . ,_) `(right ,s))
     (`(,_ . ,tail) (gfn-find-title-in-head tail))
-    (`nil, 'none)))
+    (`nil `(left "cannot detect title"))))
 
 (defun gfn-extract-title-from-dom (data)
   (pcase data
-    (`(html ,_ ((head . ,head-content) . ,_)) (gfn-find-title-in-head head-content))
-    (_ 'none)))
+    (`(html ,_ (head ,_ . ,head-content) . ,_) (gfn-find-title-in-head head-content))
+    (_ `(left "cannot detect head"))))
 
 (defun gfn-insert-md-link-main (url title)
   (insert (format "* [%s](%s)" title url)))
 
-(defun gfn-request-get-html (url)
+(defun gfn-request-get-html (url callback)
+  (interactive "sURL: ")
   (request
    url
-   :parser (lambda () (libxml-parse-html-region (point) (point-max)))
+   :parser 'buffer-string
    :error
    (cl-function
     (lambda (&key error-thrown &allow-other-keys&rest _)
-      ('left (format "%S" error-thrown))))
+      (apply callback (list `(left ,(format "%S" error-thrown))))))
    :success
    (cl-function
     (lambda (&key data &allow-other-keys)
-      ('right data)))))
+      (when data                       ; -- if `data` is not `nil`
+        (defvar gfn-var-temp `(left "init"))
+        (with-current-buffer (get-buffer-create "*response body*")
+          (erase-buffer)
+          (insert data)
+          (setq gfn-var-temp (list `(right ,(libxml-parse-html-region (point-min) (point-max))))))
+        (apply callback gfn-var-temp))))))
 
 (defun gfn-insert-md-link (url)
   (interactive "sURL: ")
-  (pcase (gfn-request-get-html url)
-    (`(right ,data)
-     (pcase (gfn-extract-title-from-dom data)
-       (`(some ,title)
-        (gfn-insert-md-link-main url title))
-       (`none
-        (message "cannot detect the title of the given page"))))
-    (`(left ,error-message)
-     (message "got error: %s" error-message))))
+  (gfn-request-get-html
+   url
+   (lambda (res)
+     (message (format "%s" res))
+     (pcase res
+       (`(right ,data)
+        (pcase (gfn-extract-title-from-dom data)
+          (`(right ,title)
+           (progn
+             (gfn-insert-md-link-main url title)
+             (message "finished")))
+          (`(left ,errmsg)
+           (message errmsg))))
+       (`(left ,error-message)
+        (message "got error: %s" error-message))))))
 
 ;; ==== ==== ==== ==== DISTRIBUTED PACKAGES ==== ==== ==== ====
 ;; ---- ---- package ---- ----
