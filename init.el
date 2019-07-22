@@ -1,5 +1,5 @@
-; -*- lexical-binding: t -*-
 ;; ==== ==== ==== ==== GENRAL SETTINGS ==== ==== ==== ====
+; -*- lexical-binding: t -*-
 ;; ---- ---- garbage collection ---- ----
 (setq gc-cons-threshold (* 20 gc-cons-threshold))
 
@@ -148,11 +148,24 @@
     (`(,_ . ,tail) (gfn-find-title-in-head tail))
     (`nil `(left "cannot detect title"))))
 
-(defun gfn-extract-title-from-dom (data)
-  (pcase data
-    (`(html ,_ (head ,_ . ,head-content) . ,_) (gfn-find-title-in-head head-content))
-    (`(top ,_ (html ,_ (head ,_ . ,head-content) . ,_) . ,_) (gfn-find-title-in-head head-content))
-    (_ `(left "cannot detect head"))))
+(defun gfn-foldl (f i xs)
+  (pcase xs
+    (`nil i)
+    (`(,x . ,tail) (gfn-foldl f (apply f (list i x)) tail))))
+
+(defun gfn-extract-title-from-dom (dom)
+  (pcase dom
+    (`(title ,_ ,s)
+     `(right ,s))
+    (`(,_ ,_ . ,children)
+     (gfn-foldl
+      (lambda (res child)
+        (pcase res
+          (`(right ,_) res)
+          (`(left ,_) (gfn-extract-title-from-dom child))))
+      `(left "seed")
+      children))))
+
 
 (defun gfn-insert-md-link-main (url title)
   (insert (format "* 参考： [%s](%s)" title url)))
@@ -169,31 +182,36 @@
    :success
    (cl-function
     (lambda (&key data &allow-other-keys)
-      (when data                       ; -- if `data` is not `nil`
-        (defvar gfn-var-temp `(left "init"))
-        (with-current-buffer (get-buffer-create "*response body*")
-          (erase-buffer)
-          (insert data)
-          (setq gfn-var-temp (list `(right ,(libxml-parse-html-region (point-min) (point-max))))))
-        (apply callback gfn-var-temp))))))
+      (if data ; -- if `data` is not `nil`
+          (progn
+            (defvar gfn-var-temp)
+            (with-current-buffer (get-buffer-create "*response body*")
+              (erase-buffer)
+              (insert data)
+              (setq gfn-var-temp (libxml-parse-html-region (point-min) (point-max))))
+            (apply callback (list `(right ,gfn-var-temp))))
+        (apply callback (list `(left "nil-data"))))))))
 
 (defun gfn-insert-md-link (url)
   (interactive "sURL: ")
   (gfn-request-get-html
    url
    (lambda (res)
-     (message (format "%s" res))
      (pcase res
-       (`(right ,data)
-        (pcase (gfn-extract-title-from-dom data)
+       (`(right ,dom)
+        (pcase (gfn-extract-title-from-dom dom)
           (`(right ,title)
            (progn
              (gfn-insert-md-link-main url title)
              (message "finished")))
           (`(left ,errmsg)
-           (message errmsg))))
-       (`(left ,error-message)
-        (message "got error: %s" error-message))))))
+           (message "got error (2): %s" errmsg))
+          (other
+           (message "bug (2): %s" other))))
+       (`(left ,errmsg)
+        (message "got error (1): %s" errmsg))
+       (other
+        (message "bug (1): %s" other))))))
 
 ;; ==== ==== ==== ==== DISTRIBUTED PACKAGES ==== ==== ==== ====
 ;; ---- ---- package ---- ----
