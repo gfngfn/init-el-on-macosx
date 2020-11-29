@@ -1,5 +1,9 @@
 ; -*- lexical-binding: t -*-
 ;; ==== ==== ==== ==== GENRAL SETTINGS ==== ==== ==== ====
+(eval-when-compile
+  (require 'use-package))
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
+
 ;; ---- ---- garbage collection ---- ----
 (setq gc-cons-threshold (* 20 gc-cons-threshold))
 
@@ -48,6 +52,9 @@
 (add-to-list 'auto-mode-alist '("\\.saty$" . satysfi-mode))
 (add-to-list 'auto-mode-alist '("\\.satyh$" . satysfi-mode))
 (add-to-list 'auto-mode-alist '("\\.satyg$" . satysfi-mode))
+
+;; ---- ---- Sesterl ---- ----
+(add-to-list 'auto-mode-alist '("\\.sest$" . sesterl-mode))
 
 ;; ==== ==== ==== ==== USER INTERFACE ==== ==== ==== ====
 ;; ---- ---- hide tool bar and menu bar ---- ----
@@ -265,7 +272,7 @@
  '(custom-enabled-themes (quote (deeper-blue)))
  '(package-selected-packages
    (quote
-    (request company-go go-mode ensime scala-mode rustic flycheck haskell-mode elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
+    (use-package lsp-mode erlang company-go request ensime scala-mode rustic flycheck haskell-mode elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
  '(tuareg-match-clause-indent 2))
 
 ;; ---- ---- Golang ---- ----
@@ -310,8 +317,9 @@
     (add-to-list 'load-path (expand-file-name "emacs/site-lisp" opam-share))
     (autoload 'merlin-mode "merlin" nil t nil)
     (add-hook 'tuareg-mode-hook 'merlin-mode t)
-    (add-hook 'caml-mode-hook 'merlin-mode t)))
-(setq merlin-ac-setup t)
+    (add-hook 'caml-mode-hook 'merlin-mode t)
+    (setq merlin-command 'opam)
+    (setq merlin-use-auto-complete-mode 'easy)))
 
 ;; ---- ---- coq ---- ----
 (setq auto-mode-alist (cons '("\\.v$" . coq-mode) auto-mode-alist))
@@ -404,8 +412,8 @@
 (require 'request)
 
 ;; ==== ==== ==== ==== KEY BIND ==== ==== ==== ====
-;(global-set-key [M-kanji] 'ignore)
-;(global-set-key [kanji] 'ignore)
+                                        ;(global-set-key [M-kanji] 'ignore)
+                                        ;(global-set-key [kanji] 'ignore)
 ;; ---- ---- common ---- ----
 (define-key global-map (kbd "C-c s") 'query-replace)
 (define-key global-map (kbd "C-c a") 'beginning-of-buffer)
@@ -448,6 +456,10 @@
 (require 'open-group)
 (require 'mcrd)
 (require 'satysfi)
+(require 'sesterl-mode)
+
+;; ---- ---- rustic ---- ----
+(use-package rustic)
 
 ;; ==== ==== ==== ==== FOOTER ==== ==== ==== ====
 (provide 'init)
