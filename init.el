@@ -272,7 +272,7 @@
  '(custom-enabled-themes (quote (deeper-blue)))
  '(package-selected-packages
    (quote
-    (merlin eglot-fsharp fsharp-mode use-package lsp-mode erlang company-go request ensime scala-mode rustic flycheck haskell-mode elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
+    (proof-general merlin eglot-fsharp fsharp-mode use-package lsp-mode erlang company-go request ensime scala-mode rustic flycheck haskell-mode elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
  '(tuareg-match-clause-indent 2))
 
 ;; ---- ---- Golang ---- ----
@@ -321,16 +321,17 @@
     (setq merlin-command 'opam)
     (setq merlin-use-auto-complete-mode 'easy)))
 
-;; ---- ---- coq ---- ----
-(setq auto-mode-alist (cons '("\\.v$" . coq-mode) auto-mode-alist))
-(autoload 'coq-mode "gallina" "Major mode for editing Coq vernacular." t)
-(autoload 'run-coq "inferior-coq" "Run an inferior Coq process." t)
-(autoload 'run-coq-other-window "inferior-coq" "Run an inferior Coq process in a new window." t)
-(autoload 'run-coq-other-frame "inferior-coq" "Run an inferior Coq process in a new frame." t)
-(load-file "/usr/local/share/emacs/site-lisp/proof-general/generic/proof-site.el")
+;; ---- ---- Coq ---- ----
+;(autoload 'coq-mode "gallina" "Major mode for editing Coq vernacular." t)
+;(autoload 'run-coq "inferior-coq" "Run an inferior Coq process." t)
+;(autoload 'run-coq-other-window "inferior-coq" "Run an inferior Coq process in a new window." t)
+;(autoload 'run-coq-other-frame "inferior-coq" "Run an inferior Coq process in a new frame." t)
+;(load-file "/usr/local/share/emacs/site-lisp/proof-general/generic/proof-site.el")
+(require 'proof-general)
+(setenv "OCAMLFIND_CONF" (concat (getenv "HOME") "/.opam/4.12.0/lib/findlib.conf"))
 
 ;; ---- ---- install-elisp ---- ----
-;(require 'install-elisp)
+                                        ;(require 'install-elisp)
 
 ;; ---- ---- restart-emacs ---- ----
 (require 'restart-emacs)
@@ -468,3 +469,6 @@
 ;; ==== ==== ==== ==== FOOTER ==== ==== ==== ====
 (provide 'init)
 ;;; init.el ends here
+;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
+(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
+;; ## end of OPAM user-setup addition for emacs / base ## keep this line
