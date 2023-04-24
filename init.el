@@ -1,9 +1,15 @@
 ; -*- lexical-binding: t -*-
 ;; ==== ==== ==== ==== GENRAL SETTINGS ==== ==== ==== ====
-;; ---- ---- macOS-specific setting ---- ----
-(when (eq system-type 'darwin) ;; mac specific settings
+;; ---- ---- macOS-specific settings ---- ----
+(when (eq system-type 'darwin)
   (setq mac-option-modifier 'meta)
-  (setq mac-command-modifier 'super))
+  (setq mac-command-modifier 'super)
+  (define-key global-map (kbd "s-c") 'kill-ring-save)
+  (define-key global-map (kbd "s-q") 'save-buffers-kill-terminal)
+  (define-key global-map (kbd "s-s") 'save-buffer)
+  (define-key global-map (kbd "s-v") 'yank)
+  ;;(add-to-list 'default-frame-alist '(fullscreen . fullboth))
+)
 
 ;; ---- ---- package ---- ----
 (require 'package)
