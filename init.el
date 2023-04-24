@@ -1,5 +1,19 @@
 ; -*- lexical-binding: t -*-
 ;; ==== ==== ==== ==== GENRAL SETTINGS ==== ==== ==== ====
+;; ---- ---- macOS-specific setting ---- ----
+(when (eq system-type 'darwin) ;; mac specific settings
+  (setq mac-option-modifier 'meta)
+  (setq mac-command-modifier 'super))
+
+;; ---- ---- package ---- ----
+(require 'package)
+(add-to-list 'package-archives '("melpa"        . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives '("marmalade"    . "http://marmalade-repo.org/packages/") t)
+(add-to-list 'package-archives '("org"          . "http://orgmode.org/elpa/") t)
+
+(package-initialize)
+
 (eval-when-compile
   (require 'use-package))
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
@@ -218,15 +232,6 @@
         (message "bug (1): %s" other))))))
 
 ;; ==== ==== ==== ==== DISTRIBUTED PACKAGES ==== ==== ==== ====
-;; ---- ---- package ---- ----
-(require 'package)
-(add-to-list 'package-archives '("melpa"        . "https://melpa.org/packages/") t)
-(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-(add-to-list 'package-archives '("marmalade"    . "http://marmalade-repo.org/packages/") t)
-(add-to-list 'package-archives '("org"          . "http://orgmode.org/elpa/") t)
-
-(package-initialize)
-
 ;; ---- ---- exec-path-from-shell ---- ----
 (require 'exec-path-from-shell)
 (exec-path-from-shell-initialize)
@@ -272,7 +277,7 @@
  '(custom-enabled-themes (quote (deeper-blue)))
  '(package-selected-packages
    (quote
-    (proof-general merlin eglot-fsharp fsharp-mode use-package lsp-mode erlang company-go request ensime scala-mode rustic flycheck haskell-mode elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext paredit open-junk-file helm auto-complete auto-async-byte-compile)))
+    (proof-general merlin eglot-fsharp fsharp-mode use-package lsp-mode erlang company-go request ensime scala-mode rustic flycheck haskell-mode elm-mode sml-mode flymake-cursor point-undo htmlize markdown-mode exec-path-from-shell undo-tree tuareg tabbar restart-emacs recentf-ext open-junk-file helm auto-complete auto-async-byte-compile)))
  '(tuareg-match-clause-indent 2))
 
 ;; ---- ---- Golang ---- ----
@@ -345,11 +350,11 @@
 (global-undo-tree-mode t)
 
 ;; ---- ---- paredit ---- ----
-(require 'paredit)
-(add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-(add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
-(add-hook 'lisp-mode-hook 'enable-paredit-mode)
-(add-hook 'ielm-mode-hook 'enable-paredit-mode)
+;;(require 'paredit)
+;;(add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
+;;(add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
+;;(add-hook 'lisp-mode-hook 'enable-paredit-mode)
+;;(add-hook 'ielm-mode-hook 'enable-paredit-mode)
 
 ;; ---- ---- auto-complete ---- ----
 (require 'auto-complete)
@@ -370,9 +375,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-
-;; ---- ---- point-undo ---- ----
-(require 'point-undo)
 
 ;; ---- ---- flymake / flymake-cursor ---- ----
 (require 'flymake)
@@ -399,10 +401,10 @@
 (require 'egison-mode)
 
 ;; ---- ---- haskell-mode ---- ----
-(require 'hs-lint)
-(defun my-haskell-mode-hook ()
-    (local-set-key (kbd "C-c l") 'hs-lint))
-(add-hook 'haskell-mode-hook 'my-haskell-mode-hook)
+;;(require 'hs-lint)
+;; (defun my-haskell-mode-hook ()
+;;   (local-set-key (kbd "C-c l") 'hs-lint))
+;; (add-hook 'haskell-mode-hook 'my-haskell-mode-hook)
 
 ;; ---- ---- fsharp-mode ---- ----
 (setq-default fsharp-indent-offset 2)
@@ -414,6 +416,13 @@
 
 ;; ---- ---- request --- ----
 (require 'request)
+
+;; ---- ---- rustic ---- ----
+(use-package rustic)
+(setq rustic-format-on-save t)
+
+;; ---- ---- point-undo ---- ----
+;;(require 'point-undo)
 
 ;; ==== ==== ==== ==== KEY BIND ==== ==== ==== ====
                                         ;(global-set-key [M-kanji] 'ignore)
@@ -457,14 +466,10 @@
 
 ;; ==== ==== ==== ==== MY PACKAGES ==== ==== ==== ====
 (require 'gfn-latex)
-(require 'open-group)
-(require 'mcrd)
+;;(require 'open-group)
+;;(require 'mcrd)
 (require 'satysfi)
 (require 'sesterl-mode)
-
-;; ---- ---- rustic ---- ----
-(use-package rustic)
-(setq rustic-format-on-save t)
 
 ;; ==== ==== ==== ==== FOOTER ==== ==== ==== ====
 (provide 'init)
